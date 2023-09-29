@@ -7,21 +7,29 @@ from watchdog.events import FileSystemEventHandler
 # Specify the directory you want to watch
 path_to_watch = "C:/Users/koben/Desktop/Coding Practice"
 
+file_location = ''
+is_editing = False
+editing_minutes=0
+
 class MyHandler(FileSystemEventHandler):
     def on_created(self, event):
         file_location = event.src_path
+        is_editing = True #Toggles the is editing varable to true, activating a while loop that will add minutes to a variable
         print(f"{event.src_path} was created")
 
     def on_deleted(self, event):
         file_location = event.src_path
+        is_editing = True #Toggles the is editing varable to true, activating a while loop that will add minutes to a variable
         print(f"{event.src_path} was deleted")
 
     def on_modified(self, event):
         file_location = event.src_path
+        is_editing = True #Toggles the is editing varable to true, activating a while loop that will add minutes to a variable
         print(f"{event.src_path} has been modified")
 
     def on_moved(self, event):
         file_location = event.src_path
+        is_editing = True #Toggles the is editing varable to true, activating a while loop that will add minutes to a variable
         print(f"moved {event.src_path} to {event.dest_path}")
 
 # Create an observer
@@ -42,30 +50,31 @@ except KeyboardInterrupt:
 
 observer.join()
 
+while is_editing == True:
+    editing_minutes += 1
+    time.sleep(60)
 
-
-
-
-def track_commits_in_directory(directory_path):
-    # Check if the directory is a Git repository
+def track_commits_in_directory(file_location):
     try:
-        repo = git.Repo(directory_path)
+        repo = git.Repo(file_location + '/.git')
     except git.exc.InvalidGitRepositoryError:
-        return  # Not a Git repository
+        return False  # Not a Git repository
 
-    # Get the list of commits
     commits = list(repo.iter_commits())
+    return len(commits)
 
-    # Print commit information
-    for commit in commits:
-        print("Commit:", commit.hexsha)
-        print("Author:", commit.author.name)
-        print("Date:", commit.committed_datetime)
-        print("Message:", commit.message)
-        print("-" * 50)
+previous_commit_count = 0
 
-# Recursively iterate through child directories
-for root, dirs, files in os.walk(parent_dir):
-    for dir_name in dirs:
-        dir_path = os.path.join(root, dir_name)
-        track_commits_in_directory(dir_path)
+while True:
+    current_commit_count = track_commits_in_directory(file_location)
+
+    if current_commit_count > previous_commit_count:
+        # Commit detected, start your event here
+        print("Commit detected!")
+
+        is_editing = False
+
+        # Update the previous commit count
+        previous_commit_count = current_commit_count
+
+    time.sleep(60)  # Sleep for 60 seconds before checking again
