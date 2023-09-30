@@ -9,7 +9,7 @@ from watchdog.events import FileSystemEventHandler
 path_to_watch = "C:/Users/koben/Desktop/Coding Practice"
 
 # Define a set of patterns to ignore (e.g., ignore .git and .vscode folders)
-ignore_patterns = ["*/.git/*", "*/.vscode/*"]
+ignore_patterns = ["*/.git/* """, "*/.vscode/*"""]
 
 file_location = ''
 is_editing = False
@@ -57,13 +57,12 @@ editing_thread.start()
 
 def track_commits_in_directory(directory_path):
     try:
+        # Check if it's a directory with a .git folder or a file within a Git repository
         if os.path.isdir(directory_path):
-            repo_path = os.path.join(directory_path, '.git')
-            repo = git.Repo(repo_path)
+            repo = git.Repo(directory_path)
         else:
             # If it's a file, get the directory containing the file
-            repo_path = os.path.join(os.path.dirname(directory_path), '.git')
-            repo = git.Repo(repo_path)
+            repo = git.Repo(os.path.dirname(directory_path))
     except git.exc.InvalidGitRepositoryError:
         return False  # Not a Git repository
 
@@ -99,4 +98,4 @@ except KeyboardInterrupt:
 
 observer.join()
 
-# this is where I tested edits
+#checking for watchdog interference
