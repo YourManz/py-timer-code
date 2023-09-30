@@ -70,6 +70,7 @@ def git_commit_tracker(previous_commit_count):
             # Commit detected, start your event here
             print("Commit detected!")
             is_editing = False
+            print(editing_minutes)
             previous_commit_count = current_commit_count
         time.sleep(60)
 
