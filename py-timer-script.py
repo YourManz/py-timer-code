@@ -47,7 +47,13 @@ editing_thread.start()
 
 def track_commits_in_directory(directory_path):
     try:
-        repo = git.Repo(directory_path)
+        if os.path.isdir(directory_path):
+            repo_path = os.path.join(directory_path, '.git')
+            repo = git.Repo(repo_path)
+        else:
+            # If it's a file, get the directory containing the file
+            repo_path = os.path.join(os.path.dirname(directory_path), '.git')
+            repo = git.Repo(repo_path)
     except git.exc.InvalidGitRepositoryError:
         return False  # Not a Git repository
 
