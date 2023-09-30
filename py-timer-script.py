@@ -8,18 +8,28 @@ from watchdog.events import FileSystemEventHandler
 # Specify the directory you want to watch
 path_to_watch = "C:/Users/koben/Desktop/Coding Practice"
 
+# Define a set of patterns to ignore (e.g., ignore .git and .vscode folders)
+ignore_patterns = ["*/.git/*", "*/.vscode/*"]
+
 file_location = ''
 is_editing = False
 editing_minutes = 0
 
 class MyHandler(FileSystemEventHandler):
+    def should_ignore(self, event):
+        for pattern in ignore_patterns:
+            if pattern in event.src_path:
+                return True
+        return False
+
     def on_created(self, event):
         global file_location, is_editing
-        file_location = event.src_path
-        is_editing = True
-        print(f"{event.src_path} was created")
+        if not self.should_ignore(event):
+            file_location = event.src_path
+            is_editing = True
+            print(f"{event.src_path} was created")
 
-    # Other event handlers here...
+    # Add other event handlers here...
 
 # Create an observer
 observer = Observer()
@@ -88,3 +98,5 @@ except KeyboardInterrupt:
     observer.stop()
 
 observer.join()
+
+# this is where I tested edits
